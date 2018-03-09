@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -34,13 +36,16 @@ public class Starter {
 		long DeployBuildCost = json.getJSONObject("costs").getJSONObject("deploy").getLong("rate"); 
 		long ShipBuildCost = json.getJSONObject("costs").getJSONObject("ship").getLong("rate"); 
 		long MoveBuildCost = json.getJSONObject("costs").getJSONObject("move").getLong("rate"); 
-
+		
 		System.out.println(json.toString());
 		System.out.println(MoveBuildCost);
 		
 		int i = 1;
 		
 		while(true){
+			
+			TimeUnit.sleep(1);
+
 //			sendGet("get_ledger");	
 //			sendGet("status_report");
 			
