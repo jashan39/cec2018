@@ -37,24 +37,101 @@ public class Starter {
 		long ShipBuildCost = json.getJSONObject("costs").getJSONObject("ship").getLong("rate"); 
 		long MoveBuildCost = json.getJSONObject("costs").getJSONObject("move").getLong("rate"); 
 		
-		System.out.println(json.toString());
-		System.out.println(MoveBuildCost);
+		int BuildHubCounter = HubBuildTime + 1;
+		int DeployHubCounter = 0;
+		int ShipHubCounter = 0;		
+		int MoveHubCounter = 0;
 		
-		int i = 1;
-		
-		while(true){
-			
-			TimeUnit.sleep(1);
+		boolean BuildNow = true;
+		boolean DeployNow = false;
+		boolean ShipNow = false;
+		boolean MoveNow = false;
 
-//			sendGet("get_ledger");	
-//			sendGet("status_report");
+		// Report
+		String status_report = sendGet("status_report");
+		JSONObject status = new JSONObject(status_report).getJSONObject("status_report");
+		System.out.println(status);
+		long initial_credit = status.getJSONObject("team").getLong("balance");
+		System.out.println(initial_credit);
+		
+		sendGet("build_hubs", "&hubs=[hub]");	
+		BuildNow = false;		
+		BuildHubCounter = HubBuildTime + 1;
+		DeployNow = true;
+		
+//		lifetime = 0;
+		
+		while(lifetime > 0){
+		
+			if(BuildNow && !DeployNow && !ShipNow && !MoveNow && (ShipHubCounter == 0)){
+				sendGet("build_hubs", "&hubs=[hub]");
+				BuildHubCounter = HubBuildTime + 1;
+				System.out.println("Building");
+				BuildNow = false;				
+				DeployNow = true;
+				sendGet("status_report");
+			}
 			
-			if(i > 0){
-				sendGet("build_hubs", "&hubs=[han,hands,handsad]");				
-				i--;
+			if(!BuildNow && DeployNow && !ShipNow && !MoveNow && (BuildHubCounter == 0) ){
+				sendGet("build_hubs", "&hubs=[hub]&sector_ids=[1]");
+				DeployHubCounter = DeployBuildTime + 1;
+				System.out.println("Deploying");
+				DeployNow = false;
+				ShipNow = true;
+				sendGet("status_report");
+			}
+
+			if(!BuildNow && !DeployNow && !ShipNow && MoveNow){
+				sendGet("build_hubs", "&hubs=[hub]");	
+				MoveHubCounter = MoveBuildTime + 1;
+			}
+
+			if(!BuildNow && !DeployNow && ShipNow && !MoveNow && (DeployHubCounter == 0)){
+				sendGet("build_hubs", "&hubs=[hub]");
+				ShipHubCounter = ShipBuildTime + 1;
+				System.out.println("Shipping");
+				ShipNow = false;
+				BuildNow = true;
+				sendGet("status_report");
+			}
+			
+			if(BuildHubCounter > 0){
+				TimeUnit.MILLISECONDS.sleep(ms_per_week);				
+				lifetime--;		
+				BuildHubCounter--;
+				continue;
+			}
+						
+			if(DeployHubCounter > 0){
+				TimeUnit.MILLISECONDS.sleep(ms_per_week);				
+				lifetime--;		
+				DeployHubCounter--;
+				continue;				
+			}
+
+			if(ShipHubCounter > 0){
+				TimeUnit.MILLISECONDS.sleep(ms_per_week);				
+				lifetime--;		
+				ShipHubCounter--;
+				continue;								
+			}
+
+			if(MoveHubCounter > 0){
+				TimeUnit.MILLISECONDS.sleep(ms_per_week);				
+				lifetime--;		
+				MoveHubCounter--;
+				continue;								
 			}
 		}
 			
+	}
+	
+	public static long updateCredit() throws Exception {
+		
+		long sum;
+		String status_report = sendGet("status_report");
+		JSONObject status = new JSONObject(status_report);		
+		return status.getJSONObject("status_report").getJSONObject("team").getLong("balance");
 	}
 	
 	// HTTP GET request
@@ -68,10 +145,6 @@ public class Starter {
 		// optional default is GET
 		con.setRequestMethod("GET");
 
-		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
-
 		BufferedReader in = new BufferedReader(
 		        new InputStreamReader(con.getInputStream()));
 		String inputLine;
@@ -82,8 +155,10 @@ public class Starter {
 		}
 		in.close();
 
-		//print result
-		System.out.println(response.toString());
+		if(api_call == "status_report"){
+			System.out.println(response.toString());
+		}
+
 		return response.toString();
 	}
 	
@@ -98,10 +173,6 @@ public class Starter {
 		// optional default is GET
 		con.setRequestMethod("GET");
 
-		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
-
 		BufferedReader in = new BufferedReader(
 		        new InputStreamReader(con.getInputStream()));
 		String inputLine;
@@ -113,7 +184,6 @@ public class Starter {
 		in.close();
 
 		//print result
-		System.out.println(response.toString());
 		return response.toString();
 	}
 
