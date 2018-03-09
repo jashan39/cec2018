@@ -16,7 +16,7 @@ import org.json.JSONArray;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class Starter {
+public class Starter{
 	
 	public static void main(String[] args) throws Exception{	
 		
@@ -74,14 +74,14 @@ public class Starter {
 		int totalOres = newSectors.getAdjacentOres(prospectsReport, 0, numRow, numCol);
 		System.out.println(totalOres);
 		
-		List<Integer> totalOresList = new ArrayList<Integer>();
-		for(int i=0; i<prospectsReport.length(); i++){
-			totalOresList.add(newSectors.getAdjacentOres(prospectsReport, i, numRow, numCol));
-		}
-		System.out.println(totalOresList);
-		
-		//List<Integer> totalOresList = newSectors.orderSectorOreAmounts(prospectsReport, numRow, numCol);
+		//List<Integer> totalOresList = new ArrayList<Integer>();
+		//for(int i=0; i<prospectsReport.length() &&; i++){
+		//	totalOresList.add(newSectors.getAdjacentOres(prospectsReport, i, numRow, numCol));
+		//}
 		//System.out.println(totalOresList);
+		
+		List<Integer> totalOresList = newSectors.orderSectorOreAmounts(prospectsReport, numRow, numCol);
+		System.out.println(totalOresList);
 //end Jenny New Code
 		
 		int i = 1;

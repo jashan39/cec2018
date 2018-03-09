@@ -16,7 +16,6 @@ public class Sector {
 		int totalOres = 0;
 		//sector and number of ores adjacent to it
 
-		
 		//corner sectors
 		List<Integer> cornerSectors = getCornerSectors(prospectsReport, numRow, numCol);
 		List<Integer> topSectors = getTopSectors(prospectsReport, numRow, numCol);
@@ -24,8 +23,8 @@ public class Sector {
 		List<Integer> leftSectors = getLeftSectors(prospectsReport, numRow, numCol);
 		List<Integer> rightSectors = getRightSectors(prospectsReport, numRow, numCol);
 		
-		for (int i = 0; i < prospectsReport.length(); i++) {
-			JSONArray currentSector_json = prospectsReport.getJSONArray(i);
+//		for (int i = 0; i < prospectsReport.length(); i++) {
+			JSONArray currentSector_json = prospectsReport.getJSONArray(sectorValue);
 			String currentSector_string = currentSector_json.toString();
 			
 			ArrayList<Integer> sectorAndAmount = new ArrayList<Integer>();
@@ -41,6 +40,7 @@ public class Sector {
 			
 			//Corner
 			if(cornerSectors.contains(currentSector)){
+				System.out.println("corner");
 				if(cornerSectors.indexOf(currentSector)==0){
 					ArrayList<Integer> sectorAndAmount_ind = new ArrayList<Integer>();
 					ArrayList<Integer> indices = new ArrayList<Integer>();
@@ -149,6 +149,7 @@ public class Sector {
 			
 			//Top
 			if(topSectors.contains(currentSector)){
+				System.out.println("top");
 					ArrayList<Integer> sectorAndAmount_ind = new ArrayList<Integer>();
 					ArrayList<Integer> indices = new ArrayList<Integer>();
 					int r_index = currentSector + 1;
@@ -183,6 +184,7 @@ public class Sector {
 			
 			//Bottom
 			if(bottomSectors.contains(currentSector)){
+				System.out.println("bottom");
 					ArrayList<Integer> sectorAndAmount_ind = new ArrayList<Integer>();
 					ArrayList<Integer> indices = new ArrayList<Integer>();
 					int r_index = currentSector + 1;
@@ -216,6 +218,7 @@ public class Sector {
 			}
 			//Left
 			if(leftSectors.contains(currentSector)){
+					System.out.println("left");
 					ArrayList<Integer> sectorAndAmount_ind = new ArrayList<Integer>();
 					ArrayList<Integer> indices = new ArrayList<Integer>();
 					int r_index = currentSector + 1;
@@ -231,8 +234,13 @@ public class Sector {
 					indices.add(rb_index);
 					
 					for(int index:indices){
+						try{
+							String amount_string = prospectsReport.getJSONArray(index).toString();
+						}catch(org.json.JSONException e){
+							break;
+						}
 						String amount_string = prospectsReport.getJSONArray(index).toString();
-					
+						
 						Matcher m1 = p.matcher(amount_string);
 						while (m1.find()) {
 						//System.out.println(m.group());
@@ -249,6 +257,7 @@ public class Sector {
 			}
 			//Right
 			if(rightSectors.contains(currentSector)){
+					System.out.println("right");
 					ArrayList<Integer> sectorAndAmount_ind = new ArrayList<Integer>();
 					ArrayList<Integer> indices = new ArrayList<Integer>();
 					int l_index = currentSector - 1;
@@ -264,8 +273,59 @@ public class Sector {
 					indices.add(lb_index);
 					
 					for(int index:indices){
+						try{
+							String amount_string = prospectsReport.getJSONArray(index).toString();
+						}catch(org.json.JSONException e){
+							break;
+						}
 						String amount_string = prospectsReport.getJSONArray(index).toString();
+						
+						Matcher m1 = p.matcher(amount_string);
+						while (m1.find()) {
+						//System.out.println(m.group());
+						sectorAndAmount_ind.add(Integer.parseInt(m1.group()));
+						}
 					
+						totalOres = totalOres + sectorAndAmount_ind.get(1);
+					
+						//System.out.println(r_index);
+						//System.out.println(b_index);
+						//System.out.println(rb_index);
+					}
+				
+			}
+			//Middle
+			if(!rightSectors.contains(currentSector) && !leftSectors.contains(currentSector) && !topSectors.contains(currentSector)&& !bottomSectors.contains(currentSector)&& !cornerSectors.contains(currentSector) ){
+					
+					System.out.println("middle");
+					ArrayList<Integer> sectorAndAmount_ind = new ArrayList<Integer>();
+					ArrayList<Integer> indices = new ArrayList<Integer>();
+					int l_index = currentSector - 1;
+					int r_index = currentSector + 1;
+					int t_index = currentSector - numRow;
+					int b_index = currentSector + numRow;
+					int lt_index = t_index - 1;
+					int lb_index = b_index - 1;
+					int rt_index = t_index + 1;
+					int rb_index = b_index + 1;
+					
+					indices.add(l_index);
+					indices.add(r_index);
+					indices.add(b_index);
+					indices.add(t_index);
+					indices.add(lt_index);
+					indices.add(lb_index);
+					indices.add(rt_index);
+					indices.add(rb_index);
+					
+					for(int index:indices){
+						try{
+							String amount_string = prospectsReport.getJSONArray(index).toString();
+						}catch(org.json.JSONException e){
+							break;
+						}
+						String amount_string = prospectsReport.getJSONArray(index).toString();
+						
 						Matcher m1 = p.matcher(amount_string);
 						while (m1.find()) {
 						//System.out.println(m.group());
@@ -281,7 +341,7 @@ public class Sector {
 				
 			}
 			
-		}
+//		}
 		
 		return totalOres;
 	}
@@ -289,6 +349,9 @@ public class Sector {
 	List<Integer> orderSectorOreAmounts(JSONArray prospectsReport, int numRow, int numCol) throws JSONException{
 		List<Integer> sectorOreAmounts = new ArrayList<Integer>();
 		for(int i=0; i<prospectsReport.length(); i++){
+			if(i==390){
+				break;
+			}
 			sectorOreAmounts.add(getAdjacentOres(prospectsReport, i, numRow, numCol));
 		}
 		
@@ -342,5 +405,7 @@ public class Sector {
 		}
 		return rightSectors;
 	}
+
+	
 	
 }
